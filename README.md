@@ -1,3 +1,2 @@
-# ToDo Application
-
-Java Web Application for the Web Development II subject 
+# appTodo
+Aplicação Teste Java Web para cadastrar usuários e tarefas associadas aos usuários.
