@@ -1,4 +1,3 @@
-  
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -9,20 +8,27 @@ package br.edu.unipam.entity;
 import java.time.LocalDate;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import java.io.Serializable;
 import javax.persistence.ManyToOne;
 
-/**
- *
- * @author celsojunio11
- */
 @Entity
 public class Tarefa extends AbstractEntity {
+public class Tarefa extends AbstractEntity implements Serializable{
   private String Descricao;
   private LocalDate DataPrevista;
   private LocalDate DataTermino;
   
+
   @ManyToOne
   private Usuario usuario;
+
+  public Usuario getUsuario() {
+    return usuario;
+  }
+
+  public void setUsuario(Usuario usuario) {
+    this.usuario = usuario;
+  }
 
   public String getDescricao() {
     return Descricao;
@@ -47,4 +53,5 @@ public class Tarefa extends AbstractEntity {
   public void setDataTermino(LocalDate DataTermino) {
     this.DataTermino = DataTermino;
   }
-}
+} 
+  } 

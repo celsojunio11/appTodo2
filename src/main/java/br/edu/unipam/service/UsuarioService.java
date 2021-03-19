@@ -8,6 +8,8 @@ package br.edu.unipam.service;
 import br.edu.unipam.entity.Usuario;
 import java.util.List;
 import javax.enterprise.context.RequestScoped;
+import java.util.List;
+import javax.enterprise.context.RequestScoped;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
@@ -15,6 +17,7 @@ import javax.transaction.Transactional;
 /**
  *
  * @author celsojunio11
+ * 
  */
 
 public class UsuarioService {
