@@ -11,6 +11,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  *
@@ -18,35 +20,34 @@ import javax.persistence.MappedSuperclass;
  */
 @MappedSuperclass
 public abstract class AbstractEntity {
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  protected Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    protected Long id;
+    public Date getDataCriacao() {
+        return DataCriacao;
+    }
+    public void setDataCriacao(Date DataCriacao) {
+        this.DataCriacao = DataCriacao;
+    }
+    public Date getDataAlteracao() {
+        return DataAlteracao;
+    }
+    public void setDataAlteracao(Date DataAlteracao) {
+        this.DataAlteracao = DataAlteracao;
+    }
 
-  public Date getDataCriacao() {
-    return DataCriacao;
-  }
+    @Temporal(TemporalType.DATE)
+    protected Date DataCriacao;
 
-  public void setDataCriacao(Date DataCriacao) {
-    this.DataCriacao = DataCriacao;
-  }
+    @Temporal(TemporalType.DATE)
+    protected Date DataAlteracao;
 
-  public Date getDataAlteracao() {
-    return DataAlteracao;
-  }
-
-  public void setDataAlteracao(Date DataAlteracao) {
-    this.DataAlteracao = DataAlteracao;
-  }
-  
-  protected Date DataCriacao;
-  
-  protected Date DataAlteracao;
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
+    
+    
 }
