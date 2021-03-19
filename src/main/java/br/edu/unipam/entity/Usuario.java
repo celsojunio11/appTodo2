@@ -16,7 +16,7 @@ import javax.persistence.OneToMany;
 
 /**
  *
- * @author JrAdilson
+ * @author celsojunio11
  */
 @Entity
 public class Usuario extends AbstractEntity {
