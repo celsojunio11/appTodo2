@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package br.edu.unipam.service;
 import br.edu.unipam.entity.Usuario;
 import java.util.List;
@@ -14,7 +9,10 @@ import javax.transaction.Transactional;
  *
  * @author celsojunio11
  */
+
+@Transactional
 public class UsuarioService {
+
     @PersistenceContext(name = "pu_todo")
     private EntityManager entityManager;
     //inserir
@@ -49,6 +47,6 @@ public class UsuarioService {
         //return entityManager.createQuery("select u from Usuario u order by u.nome", Usuario.class).getResultList();
         return entityManager.createNamedQuery(Usuario.GET_ALL_USERS, Usuario.class).getResultList();
     }
-
+    
     //ToDo: Salvar usuario
 }
