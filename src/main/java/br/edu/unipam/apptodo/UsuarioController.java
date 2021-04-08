@@ -3,10 +3,15 @@ package br.edu.unipam.apptodo;
 import br.edu.unipam.entity.Usuario;
 import br.edu.unipam.apptodo.util.JsfUtil;
 import br.edu.unipam.apptodo.util.PaginationHelper;
+import br.edu.unipam.apptodo.util.JsfUtil.PersistAction;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.EJB;
+import javax.ejb.EJBException;
 import javax.inject.Named;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.component.UIComponent;
@@ -28,6 +33,10 @@ public class UsuarioController implements Serializable {
     @EJB private br.edu.unipam.apptodo.UsuarioFacade ejbFacade;
     private PaginationHelper pagination;
     private int selectedItemIndex;
+    @EJB
+    private br.edu.unipam.apptodo.UsuarioFacade ejbFacade;
+    private List<Usuario> items = null;
+    private Usuario selected;
 
     public UsuarioController() {
     }
@@ -59,23 +68,28 @@ public class UsuarioController implements Serializable {
             };
         }
         return pagination;
+        return selected;
     }
 
     public String prepareList() {
         recreateModel();
         return "List";
+    public void setSelected(Usuario selected) {
+        this.selected = selected;
     }
 
     public String prepareView() {
         current = (Usuario)getItems().getRowData();
         selectedItemIndex = pagination.getPageFirstItem() + getItems().getRowIndex();
         return "View";
+    protected void setEmbeddableKeys() {
     }
 
     public String prepareCreate() {
         current = new Usuario();
         selectedItemIndex = -1;
         return "Create";
+    protected void initializeEmbeddableKey() {
     }
 
     public String create() {
@@ -93,6 +107,8 @@ public class UsuarioController implements Serializable {
         current = (Usuario)getItems().getRowData();
         selectedItemIndex = pagination.getPageFirstItem() + getItems().getRowIndex();
         return "Edit";
+    private UsuarioFacade getFacade() {
+        return ejbFacade;
     }
 
     public String update() {
@@ -104,6 +120,10 @@ public class UsuarioController implements Serializable {
             JsfUtil.addErrorMessage(e, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
             return null;
         }
+    public Usuario prepareCreate() {
+        selected = new Usuario();
+        initializeEmbeddableKey();
+        return selected;
     }
 
     public String destroy() {
@@ -125,6 +145,10 @@ public class UsuarioController implements Serializable {
             // all items were removed - go back to list
             recreateModel();
             return "List";
+    public void create() {
+        persist(PersistAction.CREATE, ResourceBundle.getBundle("/Bundle").getString("UsuarioCreated"));
+        if (!JsfUtil.isValidationFailed()) {
+            items = null;    // Invalidate list of items to trigger re-query.
         }
     }
 
@@ -135,6 +159,8 @@ public class UsuarioController implements Serializable {
         } catch (Exception e) {
             JsfUtil.addErrorMessage(e, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
         }
+    public void update() {
+        persist(PersistAction.UPDATE, ResourceBundle.getBundle("/Bundle").getString("UsuarioUpdated"));
     }
 
     private void updateCurrentItem() {
@@ -149,12 +175,19 @@ public class UsuarioController implements Serializable {
         }
         if (selectedItemIndex >= 0) {
             current = getFacade().findRange(new int[]{selectedItemIndex, selectedItemIndex+1}).get(0);
+    public void destroy() {
+        persist(PersistAction.DELETE, ResourceBundle.getBundle("/Bundle").getString("UsuarioDeleted"));
+        if (!JsfUtil.isValidationFailed()) {
+            selected = null; // Remove selection
+            items = null;    // Invalidate list of items to trigger re-query.
         }
     }
 
     public DataModel getItems() {
+    public List<Usuario> getItems() {
         if (items == null) {
             items = getPagination().createPageDataModel();
+            items = getFacade().findAll();
         }
         return items;
     }
@@ -177,21 +210,54 @@ public class UsuarioController implements Serializable {
         getPagination().previousPage();
         recreateModel();
         return "List";
+    private void persist(PersistAction persistAction, String successMessage) {
+        if (selected != null) {
+            setEmbeddableKeys();
+            try {
+                if (persistAction != PersistAction.DELETE) {
+                    getFacade().edit(selected);
+                } else {
+                    getFacade().remove(selected);
+                }
+                JsfUtil.addSuccessMessage(successMessage);
+            } catch (EJBException ex) {
+                String msg = "";
+                Throwable cause = ex.getCause();
+                if (cause != null) {
+                    msg = cause.getLocalizedMessage();
+                }
+                if (msg.length() > 0) {
+                    JsfUtil.addErrorMessage(msg);
+                } else {
+                    JsfUtil.addErrorMessage(ex, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
+                }
+            } catch (Exception ex) {
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
+                JsfUtil.addErrorMessage(ex, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
+            }
+        }
     }
 
     public SelectItem[] getItemsAvailableSelectMany() {
         return JsfUtil.getSelectItems(ejbFacade.findAll(), false);
+    public Usuario getUsuario(java.lang.Long id) {
+        return getFacade().find(id);
     }
 
     public SelectItem[] getItemsAvailableSelectOne() {
         return JsfUtil.getSelectItems(ejbFacade.findAll(), true);
+    public List<Usuario> getItemsAvailableSelectMany() {
+        return getFacade().findAll();
     }
 
     public Usuario getUsuario(java.lang.Long id) {
         return ejbFacade.find(id);
+    public List<Usuario> getItemsAvailableSelectOne() {
+        return getFacade().findAll();
     }
 
     @FacesConverter(forClass=Usuario.class)
+    @FacesConverter(forClass = Usuario.class)
     public static class UsuarioControllerConverter implements Converter {
 
         @Override
@@ -200,22 +266,20 @@ public class UsuarioController implements Serializable {
                 return null;
             }
             UsuarioController controller = (UsuarioController)facesContext.getApplication().getELResolver().
+            UsuarioController controller = (UsuarioController) facesContext.getApplication().getELResolver().
                     getValue(facesContext.getELContext(), null, "usuarioController");
             return controller.getUsuario(getKey(value));
         }
-
         java.lang.Long getKey(String value) {
             java.lang.Long key;
             key = Long.valueOf(value);
             return key;
         }
-
         String getStringKey(java.lang.Long value) {
             StringBuilder sb = new StringBuilder();
             sb.append(value);
             return sb.toString();
         }
-
         @Override
         public String getAsString(FacesContext facesContext, UIComponent component, Object object) {
             if (object == null) {
@@ -226,9 +290,10 @@ public class UsuarioController implements Serializable {
                 return getStringKey(o.getId());
             } else {
                 throw new IllegalArgumentException("object " + object + " is of type " + object.getClass().getName() + "; expected type: "+Usuario.class.getName());
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "object {0} is of type {1}; expected type: {2}", new Object[]{object, object.getClass().getName(), Usuario.class.getName()});
+                return null;
             }
         }
 
     }
-
 }

@@ -4,6 +4,8 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core">
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
 
     <ui:composition template="/template.xhtml">
         <ui:define name="title">
@@ -40,8 +42,38 @@
                 <br />
                 <br />
                 <h:link outcome="/index" value="#{bundle.CreateTarefaIndexLink}"/>
+    <ui:composition>
+
+        <p:dialog id="TarefaCreateDlg" widgetVar="TarefaCreateDialog" modal="true" resizable="false" appendTo="@(body)" header="#{bundle.CreateTarefaTitle}">
+            <h:form id="TarefaCreateForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" rendered="#{tarefaController.selected != null}">
+                        <p:outputLabel value="#{bundle.CreateTarefaLabel_usuario}" for="usuario" />
+                        <p:selectOneMenu id="usuario" value="#{tarefaController.selected.usuario}" >
+                            <f:selectItems value="#{usuarioController.itemsAvailableSelectOne}"
+                                           var="usuarioItem"
+                                           itemValue="#{usuarioItem}"/>
+                        </p:selectOneMenu>
+                        <p:outputLabel value="#{bundle.CreateTarefaLabel_descricao}" for="descricao" />
+                        <p:inputText id="descricao" value="#{tarefaController.selected.descricao}" title="#{bundle.CreateTarefaTitle_descricao}" />
+                        <p:outputLabel value="#{bundle.CreateTarefaLabel_dataPrevista}" for="dataPrevista" />
+                        <p:inputText id="dataPrevista" value="#{tarefaController.selected.dataPrevista}" title="#{bundle.CreateTarefaTitle_dataPrevista}" />
+                        <p:outputLabel value="#{bundle.CreateTarefaLabel_dataTermino}" for="dataTermino" />
+                        <p:inputText id="dataTermino" value="#{tarefaController.selected.dataTermino}" title="#{bundle.CreateTarefaTitle_dataTermino}" />
+                        <p:outputLabel value="#{bundle.CreateTarefaLabel_dataCriacao}" for="dataCriacao" />
+                        <p:inputText id="dataCriacao" value="#{tarefaController.selected.dataCriacao}" title="#{bundle.CreateTarefaTitle_dataCriacao}" />
+                        <p:outputLabel value="#{bundle.CreateTarefaLabel_dataAlteracao}" for="dataAlteracao" />
+                        <p:inputText id="dataAlteracao" value="#{tarefaController.selected.dataAlteracao}" title="#{bundle.CreateTarefaTitle_dataAlteracao}" />
+                        <p:outputLabel value="#{bundle.CreateTarefaLabel_id}" for="id" />
+                        <p:inputText id="id" value="#{tarefaController.selected.id}" title="#{bundle.CreateTarefaTitle_id}" />
+                    </p:panelGrid>
+                    <p:commandButton actionListener="#{tarefaController.create}" value="#{bundle.Save}" update="display,:TarefaListForm:datalist,:growl" oncomplete="handleSubmit(args,'TarefaCreateDialog');"/>
+                    <p:commandButton value="#{bundle.Cancel}" onclick="TarefaCreateDialog.hide()"/>
+                </h:panelGroup>
             </h:form>
         </ui:define>
     </ui:composition>
+        </p:dialog>
 
+    </ui:composition>
 </html>

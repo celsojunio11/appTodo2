@@ -1,5 +1,9 @@
 package br.edu.unipam.service;
+
 import br.edu.unipam.entity.Usuario;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import javax.enterprise.context.RequestScoped;
 import javax.persistence.EntityManager;
@@ -9,14 +13,14 @@ import javax.transaction.Transactional;
  *
  * @author celsojunio11
  */
-
 @Transactional
 public class UsuarioService {
-
     @PersistenceContext(name = "pu_todo")
     private EntityManager entityManager;
+
     //inserir
     public Usuario salvarUsuario(Usuario usuario) {
+        usuario.setDataCriacao(new Date());
         entityManager.persist(usuario);
         return usuario;
     }
@@ -35,7 +39,9 @@ public class UsuarioService {
     //Editar
     public Usuario editar(Usuario usuario) {
         Usuario userBd = localizarPorId(usuario.getId());
+
         if (userBd != null) {
+            usuario.setDataAlteracao(new Date());
             entityManager.merge(usuario);
             return usuario;
         }

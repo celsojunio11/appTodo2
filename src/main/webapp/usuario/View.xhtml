@@ -4,6 +4,8 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core">
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
 
     <ui:composition template="/template.xhtml">
         <ui:define name="title">
@@ -38,9 +40,29 @@
                 <br />
                 <br />
                 <h:link outcome="/index" value="#{bundle.ViewUsuarioIndexLink}"/>
+    <ui:composition>
 
+        <p:dialog id="UsuarioViewDlg" widgetVar="UsuarioViewDialog" modal="true" resizable="false" appendTo="@(body)" header="#{bundle.ViewUsuarioTitle}">
+            <h:form id="UsuarioViewForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" rendered="#{usuarioController.selected != null}">
+                        <h:outputText value="#{bundle.ViewUsuarioLabel_nome}"/>
+                        <h:outputText value="#{usuarioController.selected.nome}" title="#{bundle.ViewUsuarioTitle_nome}"/>
+                        <h:outputText value="#{bundle.ViewUsuarioLabel_email}"/>
+                        <h:outputText value="#{usuarioController.selected.email}" title="#{bundle.ViewUsuarioTitle_email}"/>
+                        <h:outputText value="#{bundle.ViewUsuarioLabel_dataCriacao}"/>
+                        <h:outputText value="#{usuarioController.selected.dataCriacao}" title="#{bundle.ViewUsuarioTitle_dataCriacao}"/>
+                        <h:outputText value="#{bundle.ViewUsuarioLabel_dataAlteracao}"/>
+                        <h:outputText value="#{usuarioController.selected.dataAlteracao}" title="#{bundle.ViewUsuarioTitle_dataAlteracao}"/>
+                        <h:outputText value="#{bundle.ViewUsuarioLabel_id}"/>
+                        <h:outputText value="#{usuarioController.selected.id}" title="#{bundle.ViewUsuarioTitle_id}"/>
+                    </p:panelGrid>
+                    <p:commandButton value="#{bundle.Close}" onclick="UsuarioViewDialog.hide()"/>
+                </h:panelGroup>
             </h:form>
         </ui:define>
     </ui:composition>
+        </p:dialog>
 
+    </ui:composition>
 </html>
